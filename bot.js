@@ -12,6 +12,19 @@ const client = new Client({
 
 client.once('ready', () => {
     console.log(`bot.js: ✅ Bot is online as ${client.user.tag}`);
+
+    // custom status
+    client.user.setPresence({
+        /* type: 0 = PLAYING
+           type: 1 = STREAMING
+           type: 2 = LISTENING
+           type: 3 = WATCHING
+           type: 4 = CUSTOM
+           type: 5 = COMPETING
+        */
+        activities: [{ name: "use \"/dsaa\" to run!", type: 4 }],
+        status: "online" // Options: online, idle, dnd, invisible
+    });
 });
 
 //uhhhhhh ok???
