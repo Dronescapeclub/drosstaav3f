@@ -22,7 +22,7 @@ client.once('ready', () => {
            type: 4 = CUSTOM
            type: 5 = COMPETING
         */
-        activities: [{ name: "use \"/dsaa\" to run!", type: 4 }],
+        activities: [{ name: "use \"/dsaa\" to run!", type: 5 }],
         status: "online" // Options: online, idle, dnd, invisible
     });
 });
