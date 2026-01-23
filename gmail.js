@@ -47,6 +47,9 @@ async function requestNewToken(auth) {
         });
     });
 }
+/*
+OLD )Auth2 KEY FUNCTION
+
 
 // Function to authenticate and refresh OAuth token automatically
 async function authenticate() {
@@ -55,7 +58,6 @@ async function authenticate() {
         process.env.CLIENT_SECRET,
         "http://localhost:3000"
     );
-
     if (fs.existsSync(TOKEN_PATH)) {
         let token;
         try {
@@ -81,8 +83,32 @@ async function authenticate() {
 
     return await requestNewToken(auth);
 }
-
+*/
 //#####################################################3
+
+async function authenticate() {
+    try {
+        if (!process.env.GOOGLE_CREDENTIALS_B64) {
+            console.error("gmail.js: ##ERROR: Missing GOOGLE_CREDENTIALS_B64");
+            return null;
+        }
+
+        const decoded = Buffer.from(process.env.GOOGLE_CREDENTIALS_B64, "base64").toString();
+        const credentials = JSON.parse(decoded);
+
+        const auth = new google.auth.GoogleAuth({
+            credentials,
+            scopes: ["https://www.googleapis.com/auth/gmail.readonly"],
+        });
+
+        console.log("gmail.js: ##VALIDATED: Service account authentication successful!");
+        return auth;
+    } catch (error) {
+        console.error("gmail.js: ##ERROR: Service account authentication failed:", error);
+        return null;
+    }
+}
+
 
 // Helper function to extract email body recursively
 function extractEmailBody(payload) {
