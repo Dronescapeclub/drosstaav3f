@@ -1,20 +1,12 @@
 const { google } = require('googleapis');
 const fs = require('fs');
 const path = require('path');
-const striptags = require("striptags");
 const quotedPrintable = require("quoted-printable");
 
-// Use /tmp in cloud, __dirname locally
-const TOKEN_PATH = process.env.KOYEB
-    ? path.join('/tmp', 'token.json')
-    : path.join(__dirname, 'token.json');
+// LOCAL token.json path
+const TOKEN_PATH = path.join(__dirname, 'token.json');
 
-// If TOKEN_JSON is provided via environment variable, write it to /tmp/token.json
-if (process.env.TOKEN_JSON) {
-    fs.writeFileSync(TOKEN_PATH, process.env.TOKEN_JSON);
-}
-
-// Function to request new OAuth token manually (only if needed)
+// LOCAL ONLY: request new OAuth token
 async function requestNewToken(auth) {
     const url = auth.generateAuthUrl({
         access_type: 'offline',
@@ -32,96 +24,56 @@ async function requestNewToken(auth) {
                 auth.setCredentials(tokens);
 
                 if (!tokens.refresh_token) {
-                    throw new Error("gmail.js: ##ERROR: Authentication failed: No refresh token received.");
+                    throw new Error("gmail.js: ##ERROR: No refresh token received.");
                 }
 
                 fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens, null, 2));
-                console.log("gmail.js: ##VALIDATED: Authentication successful! Refresh token saved.");
+                console.log("gmail.js: ##VALIDATED: Authentication successful!");
                 rl.close();
                 resolve(auth);
             } catch (error) {
-                console.error("gmail.js: ##ERROR: Error retrieving token:", error);
+                console.error("gmail.js: ##ERROR retrieving token:", error);
                 rl.close();
                 resolve(null);
             }
         });
     });
 }
-/*
-OLD )Auth2 KEY FUNCTION
 
-
-// Function to authenticate and refresh OAuth token automatically
+// CLOUD + LOCAL unified authenticate()
 async function authenticate() {
     const auth = new google.auth.OAuth2(
         process.env.CLIENT_ID,
         process.env.CLIENT_SECRET,
-        "http://localhost:3000"
+        "urn:ietf:wg:oauth:2.0:oob"
     );
-    if (fs.existsSync(TOKEN_PATH)) {
-        let token;
-        try {
-            token = JSON.parse(fs.readFileSync(TOKEN_PATH, 'utf-8'));
-        } catch (err) {
-            console.error("gmail.js: ##ERROR: Failed to parse token.json. Raw content:", fs.readFileSync(TOKEN_PATH, 'utf-8'));
-            throw err;
-        }
 
-        auth.setCredentials(token);
-
-        try {
-            const { credentials } = await auth.refreshAccessToken();
-            auth.setCredentials(credentials);
-            fs.writeFileSync(TOKEN_PATH, JSON.stringify(auth.credentials, null, 2));
-            console.log("gmail.js: ##VALIDATED: Token refreshed successfully!");
-            return auth;
-        } catch (error) {
-            console.error("gmail.js: ##WARNING: Token refresh failed, requesting manual authentication:", error);
-            return await requestNewToken(auth);
-        }
+    // CLOUD MODE: use refresh token from env
+    if (process.env.REFRESH_TOKEN) {
+        auth.setCredentials({
+            refresh_token: process.env.REFRESH_TOKEN
+        });
+        return auth;
     }
 
+    // LOCAL MODE: use token.json
+    if (fs.existsSync(TOKEN_PATH)) {
+        const token = JSON.parse(fs.readFileSync(TOKEN_PATH, 'utf-8'));
+        auth.setCredentials(token);
+        return auth;
+    }
+
+    // LOCAL MODE: need to authenticate manually
     return await requestNewToken(auth);
 }
-*/
-//#####################################################3
-//eee
-async function authenticate() {
-    try {
-        if (!process.env.GOOGLE_CREDENTIALS_B64) {
-            console.error("gmail.js: ##ERROR: Missing GOOGLE_CREDENTIALS_B64");
-            return null;
-        }
 
-        const decoded = Buffer.from(process.env.GOOGLE_CREDENTIALS_B64, "base64").toString();
-        const credentials = JSON.parse(decoded);
-
-        const auth = new google.auth.GoogleAuth({
-            credentials,
-            scopes: ["https://www.googleapis.com/auth/gmail.readonly"],
-        });
-
-        console.log("gmail.js: ##VALIDATED: Service account authentication successful!");
-        return auth;
-    } catch (error) {
-        console.error("gmail.js: ##ERROR: Service account authentication failed:", error);
-        return null;
-    }
-}
-
-
-// Helper function to extract email body recursively
+// Helper to extract email body
 function extractEmailBody(payload) {
     if (!payload) return null;
 
     if (payload.body?.data) {
         let decodedBody = Buffer.from(payload.body.data, 'base64').toString();
-
-        // Detect and decode quoted-printable formatting
-        if (decodedBody.includes("=")) {
-            decodedBody = quotedPrintable.decode(decodedBody);
-        }
-
+        if (decodedBody.includes("=")) decodedBody = quotedPrintable.decode(decodedBody);
         return decodedBody;
     }
 
@@ -135,16 +87,16 @@ function extractEmailBody(payload) {
     return null;
 }
 
-//main function
+// Main Gmail fetcher
 async function getLatestEmail(auth) {
     if (!auth) {
-        console.error("gmail.js: ##ERROR: AUTHENTICATION FAILED. No valid token found.");
+        console.error("gmail.js: ##ERROR: AUTH FAILED.");
         return null;
     }
 
     const gmail = google.gmail({ version: 'v1', auth });
     const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-    const query = `after:${fiveDaysAgo} from:noreply@steampowered.com subject:"Your Steam account: Access from new"`; // ✅ Filters Steam emails
+    const query = `after:${fiveDaysAgo} from:noreply@steampowered.com subject:"Your Steam account: Access from new"`;
 
     try {
         const response = await gmail.users.messages.list({
@@ -153,76 +105,45 @@ async function getLatestEmail(auth) {
             maxResults: 10,
         });
 
-        if (!response.data.messages || response.data.messages.length === 0) {
-            console.log("gmail.js: ##ERROR: NO MATCHING STEAM EMAILS FOUND WITHIN LAST 5 DAYS");
-            return { subject: "No matching emails found.", body: "No requests within last 5 days" };
+        if (!response.data.messages?.length) {
+            return { subject: "No matching emails", body: "None in last 5 days" };
         }
 
-        //  Ensure we fetch the latest valid Steam email (standalone or reply)
         const sortedEmails = await Promise.all(response.data.messages.map(async (msg) => {
             const msgDetails = await gmail.users.messages.get({ userId: 'me', id: msg.id });
-            const timestamp = parseInt(msgDetails.data.internalDate, 10);
-            return { msgDetails, timestamp };
+            return {
+                msgDetails,
+                timestamp: parseInt(msgDetails.data.internalDate, 10)
+            };
         }));
 
         sortedEmails.sort((a, b) => b.timestamp - a.timestamp);
         let latestEmail = sortedEmails[0].msgDetails;
 
-        //  Try to locate the latest reply in the thread
-        const threadId = latestEmail.data.threadId;
-        let threadMessages = await gmail.users.messages.list({ userId: 'me', q: `threadId:${threadId}` });
-
-        if (threadMessages.data?.messages && threadMessages.data.messages.length > 1) {
-            const sortedThreadMessages = await Promise.all(threadMessages.data.messages.map(async (msg) => {
-                const msgDetails = await gmail.users.messages.get({ userId: 'me', id: msg.id });
-                const timestamp = parseInt(msgDetails.data.internalDate, 10);
-                return { msgDetails, timestamp };
-            }));
-
-            sortedThreadMessages.sort((a, b) => b.timestamp - a.timestamp);
-            latestEmail = sortedThreadMessages[0]?.msgDetails || latestEmail;
-            console.log("gmail.js: ##LOG: Latest reply in thread found!");
-        } else {
-            console.log("gmail.js: ##LOG: No replies found, using latest standalone Steam email.");
-        }
-
-        // Extract email subject
-        const subjectHeader = latestEmail.data.payload.headers.find(header => header.name === "Subject");
+        const subjectHeader = latestEmail.data.payload.headers.find(h => h.name === "Subject");
         const subject = subjectHeader ? subjectHeader.value : "No Subject";
 
-        // Extract email body
         const emailBodyRaw = extractEmailBody(latestEmail.data.payload);
+        if (!emailBodyRaw) return { subject, body: "Email body not available." };
 
-        if (!emailBodyRaw) {
-            console.log("gmail.js: ##ERROR: No email body found.");
-            return { subject, body: "Email body not available." };
-        }
-
-        // Extract Steam Guard code
         const startIndex = emailBodyRaw.indexOf("Login Code");
         const endIndex = emailBodyRaw.indexOf("If this wasn't you");
-        const loginCode = (startIndex !== -1 && endIndex !== -1) 
+        const loginCode = (startIndex !== -1 && endIndex !== -1)
             ? emailBodyRaw.slice(startIndex, endIndex).trim()
             : "Login Code not found.";
 
-        // Extract Steam username from "Dear dronescape___ ,"
-        const usernameStart = emailBodyRaw.indexOf("Dear dronescape");
+        const usernameStart = emailBodyRaw.indexOf("Dear ");
         const usernameEnd = emailBodyRaw.indexOf(",", usernameStart);
-        const steamUsername = (usernameStart !== -1 && usernameEnd !== -1) 
-            ? emailBodyRaw.slice(usernameStart + 5, usernameEnd).trim() // "+5" to remove "Dear "
+        const steamUsername = (usernameStart !== -1 && usernameEnd !== -1)
+            ? emailBodyRaw.slice(usernameStart + 5, usernameEnd).trim()
             : "Username not found.";
 
-        console.log(`gmail.js: ##LOG: Latest Steam Guard code retrieved: ${loginCode}`);
-        console.log(`gmail.js: ##LOG: Steam Username retrieved: ${steamUsername}`);
-
         return { subject, body: `Username: ${steamUsername}\n${loginCode}` };
+
     } catch (error) {
-        console.error("gmail.js: ##ERROR: ERROR FETCHING EMAILS:", error);
+        console.error("gmail.js: ##ERROR FETCHING EMAILS:", error);
         return { subject: "Error retrieving email", body: "N/A" };
     }
 }
-
-
-
 
 module.exports = { authenticate, getLatestEmail };
