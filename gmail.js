@@ -45,8 +45,9 @@ async function authenticate() {
     const auth = new google.auth.OAuth2(
         process.env.CLIENT_ID,
         process.env.CLIENT_SECRET,
-        "urn:ietf:wg:oauth:2.0:oob"
-    );
+        "http://localhost:3000"
+
+);
 
     // CLOUD MODE: use refresh token from env
     if (process.env.REFRESH_TOKEN) {
