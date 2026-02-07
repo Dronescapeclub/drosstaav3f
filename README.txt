@@ -103,8 +103,11 @@ The bot is destroying the world, how can i shut it off?
                -dont touch it, its going to break the bot.
 
 
-     Did you use AI to write this?
+     Did you use AI to write the code?
                -uhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
 
 
 yeah thats all
+
+
+Self note: Commit and Push on Webstorm to apply webstorm changes to github
