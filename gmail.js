@@ -40,7 +40,7 @@ async function requestNewToken(auth) {
     });
 }
 
-// CLOUD + LOCAL unified authenticate()
+// changed oauth2.0 into local again for token access locally
 async function authenticate() {
     const auth = new google.auth.OAuth2(
         process.env.CLIENT_ID,
