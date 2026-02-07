@@ -67,7 +67,36 @@ NOTE: IF THE COMPUTER SHUTS DOWN OR NODE.JS CANT ACCESS THE INTERNET, RUN STEP 6
 
 
 
-Q&A: The bot is destroying the world, how can i shut it off?
+Q&A:
+
+Koyeb cant run the code, what do i do?
+    -Likely due to Google OAuth token/refresh token reloading, you need to reacquire it manually on VSCode/WebStorm
+        -run the code locally on a laptop, (where it says ##BOT ONLINE## in the console etc. etc.)
+        -run /dsaa in the #codes discord channel
+        -console in WebStorm/VSCode should show something similar to:
+
+        gmail.js: 🔑 Open this URL to authenticate: [https:// random google link or something]
+        gmail.js: 🔑 Enter the authorization code:
+
+        -click the link given WHILE YOU ARE LOGGED IN as dronescapeclub@gmail.com
+        -accept everything, don't question it. Will eventually transfer you to a seemingly broken page
+        -copy everything after "code=" and before "&"
+            Ex: http://localhost:3000/?code=4/0ASc3gC0ZUasy_2NzR71pco0qvcPkFLDDjb1BobBcS8k-uslErByBRczIqXqR1gX4wH-TvA&scope=https://www.googleapis.com/auth/gmail.readonly
+                copy: 4/0ASc3gC0ZUasy_2NzR71pco0qvcPkFLDDjb1BobBcS8k-uslErByBRczIqXqR1gX4wH-TvA
+        -paste code in WebStorm/VSCode
+        -/dsaa should correctly output something on discord, console should mention "Token refreshed!"
+        //GOOGLE'S AUTHORIZATION TOKEN SHOULD BE REFRESHED FROM NOW ON, FOLLOWING STEPS ARE INPUTTING CORRECT TOKENS INTO KOYEB
+        -login to koyeb (instructions on how starting on line 16 of README.txt)
+        -go to Services -> drosstaav3 -> Settings -> Environment variables and files (will go back to it later)
+        -open "token.json" in the project directory
+        -copy everything in the 2nd line after "access_token": that is in quotations
+        -paste in Koyeb's Enviroment Variables in the "Value" column for "TOKEN_JSON"
+        -copy everything in the 3nd line after "refresh_token":  that is in quotations
+        -paste in Koyeb's Enviroment Variables in the "Value" column for "REFRESH_TOKEN"
+        -save and deploy on Koyeb With Build
+        -should run now yayyyy
+
+The bot is destroying the world, how can i shut it off?
                -doing Ctrl + C in the console will stop the bot from running until you do step 6 again.
 
      What are the funny values in token.json/.env?
