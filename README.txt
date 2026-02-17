@@ -71,6 +71,7 @@ Q&A:
 
 Koyeb cant run the code, what do i do?
     -Likely due to Google OAuth token/refresh token reloading, you need to reacquire it manually on VSCode/WebStorm
+        -open the program in VSCode/WebStorm, and delete "token.json" (yes DELETE THE FILE, a new one will be generated)
         -run the code locally on a laptop, (where it says ##BOT ONLINE## in the console etc. etc.)
         -run /dsaa in the #codes discord channel
         -console in WebStorm/VSCode should show something similar to:
