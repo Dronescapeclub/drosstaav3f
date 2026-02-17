@@ -69,7 +69,7 @@ NOTE: IF THE COMPUTER SHUTS DOWN OR NODE.JS CANT ACCESS THE INTERNET, RUN STEP 6
 
 Q&A:
 
-Koyeb cant run the code, what do i do?
+Koyeb cant run the code and/or is broken, what do I do?
     -Likely due to Google OAuth token/refresh token reloading, you need to reacquire it manually on VSCode/WebStorm
         -open the program in VSCode/WebStorm, and delete "token.json" (yes DELETE THE FILE, a new one will be generated)
         -run the code locally on a laptop, (where it says ##BOT ONLINE## in the console etc. etc.)
