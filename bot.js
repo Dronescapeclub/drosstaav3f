@@ -34,6 +34,7 @@ client.on('interactionCreate', async (interaction) => {
             await interaction.editReply("✅ **Steam Guard Code**\nUsername: N/A\nLogin Code: N/A\n*No authorization codes for past 5 days*");
             return;
         }
+        console.warn("bot.js: ##COMMAND: Type 2 Data returned successfully ");
 
         await interaction.editReply(
             `✅ **Steam Guard Code**\nUsername: ${result.username}\nLogin Code: ${result.code}`
@@ -51,7 +52,7 @@ client.on('messageCreate', async (message) => {
 
     if (message.content.startsWith('/dsaa')) {
         const sentMessage = await message.channel.send(`*Searching for the latest Steam email...*`);
-
+        console.warn("bot.js: ##COMMAND: Retrieving steam data...");
         const result = await getSteamCode();
 
         if (!result.ok) {
@@ -61,7 +62,9 @@ client.on('messageCreate', async (message) => {
 
         await sentMessage.edit(
             `✅ **Steam Guard Code**\nUsername: ${result.username}\nLogin Code: ${result.code}`
+
         );
+        console.warn("bot.js: ##COMMAND: Data returned successfully");
     }
 });
 

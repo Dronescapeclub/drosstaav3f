@@ -35,7 +35,7 @@ async function getSteamCode() {
     }
 
     if (!data.ok) {
-        console.warn("gmailProxy.js: ##WARNING: Proxy returned failure:", data.message);
+        console.warn("gmailProxy.js: ##WARNING: Proxy returned empty:", data.message);
         return { ok: false, message: data.message || "Proxy returned error" };
     }
 
