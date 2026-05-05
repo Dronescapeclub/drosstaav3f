@@ -1,3 +1,5 @@
+/*
+
 const { google } = require('googleapis');
 const fs = require('fs');
 const path = require('path');
@@ -148,3 +150,5 @@ async function getLatestEmail(auth) {
 }
 
 module.exports = { authenticate, getLatestEmail };
+
+*/

@@ -1,3 +1,4 @@
+/*
 const { google } = require('googleapis');
 const fs = require('fs');   // <-- missing import
 const path = require('path');
@@ -28,3 +29,4 @@ async function authenticate() {
 }
 
 module.exports = authenticate;
+*/

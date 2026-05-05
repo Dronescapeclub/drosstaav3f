@@ -112,3 +112,19 @@ yeah thats all
 
 
 Self note: Commit and Push on Webstorm to apply webstorm changes to github
+removed:
+npm uninstall googleapis
+npm uninstall quoted-printable
+npm uninstall striptags
+npm uninstall js-base64
+npm uninstall readline
+
+generating GMAIL_PROXY_SECRET in terminal:
+-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+-paste Dv3[the generated hex value];
+npm install node-fetch@2
+
+.env
+CLIENT_ID=349382700077-4s5rtu2quttmc3ggcabjtdcboli71mbi.apps.googleusercontent.com
+CLIENT_SECRET=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
+GMAIL_PROXY_SECRET=qqq
