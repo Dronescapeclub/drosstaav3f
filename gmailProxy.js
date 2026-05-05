@@ -1,4 +1,5 @@
 //
+const fetch = require("node-fetch");
 const WEBHOOK_URL = process.env.GMAIL_PROXY_URL;
 
 async function getSteamCode() {
