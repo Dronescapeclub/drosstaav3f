@@ -18,4 +18,4 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
     }
 })();
 
-//run node deployCommands.js to re-register UI displayed here (Ex. more /commands, description, etc.)
+//run "node deployCommands.js" to re-register UI displayed here (Ex. more /commands, description, etc.)
