@@ -25,22 +25,23 @@ running on KOYEB:
 
 How to start bot locally on VSCode:
 1: download Node.js onto computer
-2: right click on the folder named "drosstaa3" and click "Open in Terminal"
+2: right click on the folder named "drosstaa3f" and click "Open in Terminal"
 3: in the command prompt that opens, type "code ." (WITHOUT THE QUOTATION MARKS)
-4: open the console in VSCode (should be opened after step 3) and paste these following commands and press enter for each line:
+4: open the console in VSCode (should be opened after step 3) and paste these following commands and 
+   press enter for each line (open terminal through Ctrl + `):
 
 node -v
 npm init -y
 npm install discord-interactions discord.js dotenv fs node-fetch path
 
 
-(dont worry about any vulnerabilities that pop up, I swear it wont steal anything...)
+(dont worry about any vulnerabilities that pop up, I swear it wont steal anything... if there aren't any vulnurabilities then ignore what I said)
 
 5: paste this command into console as well:
 
 npm list --depth=0
 
-...and something similar to this should show:
+...and something similar to this should show (version numbers dont matter):
 
 drosstaa3@1.0.0 C:\Users\someUser\Desktop\drosstaa3
 ├── discord-interactions@4.4.0
@@ -63,6 +64,29 @@ bot.js: Bot is online as DStAA#6802
 
 NOTE: IF THE COMPUTER SHUTS DOWN OR NODE.JS CANT ACCESS THE INTERNET, RUN STEP 6 IN CONSOLE TO REBOOT
 
+
+Apps script link:
+
+https://script.google.com/home/projects/10XfSH06NTJqhPQ1jwDcUe0unwloVLlH6H6cu8no3-8p_kvtKxRx28KHl/edit
+
+
+Structure:
+
+Koyeb (server)              Laptop's VSCode (server + code)
+|                               |
+github (code)                   |
+|                               |
+|                               |
+├─-------------------------------
+|
+node.js (code for networking)
+|
+├─-------------------------------------------------------------------------------------------
+|                                                                                           |
+dronescapeclub@gmail.com's AppsScript (Steam account name & Authorization code)             Discord Bot----> you
+|                                                                                           |
+|                                                                                           |
+└──------------------------------------------------------------------------------------------
 
 
 Q&A:
